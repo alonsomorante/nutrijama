@@ -1,6 +1,5 @@
 import { FoodGroupCard } from '@/components/home/food-card'
 import { foodGroups } from '@/lib/hardcode/food-groups'
-import React from 'react'
 
 export default function page() {
   return (
