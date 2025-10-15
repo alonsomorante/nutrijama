@@ -2,8 +2,6 @@ import { NutritionTable } from "@/components/table/nutrition-table"
 import { foodGroups } from "@/lib/hardcode/food-groups"
 import prisma from "@/lib/prisma"
 
-
-
 interface PageProps {
   params: Promise<{
     groupId: string
