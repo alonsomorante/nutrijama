@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cereals {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model dairy {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model drinks {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model eggs {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model fats {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model fruits {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model legumes {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model meat {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model miscellaneous {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model seafood {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model sugar {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model tubers {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
+
+model vegetables {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  energy              Float
+  protein             Float
+  total_fat           Float
+  total_carbohydrates Float
+  fibra               Float
+  calcium             Float
+  fosforo             Float
+  zinc                Float
+  iron                Float
+  sodium              Float
+  potassium           Float
+  image               String @default("none")
+}
