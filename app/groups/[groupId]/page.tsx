@@ -28,12 +28,12 @@ export default async function Page({ params }: PageProps) {
         <div className="mx-auto max-w-7xl px-6 py-8 md:px-12">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href="/">
+              {/* <Link href="/">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <ArrowLeft className="size-4" />
                   Volver
                 </Button>
-              </Link>
+              </Link> */}
               <Link href="/">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <Home className="size-4" />

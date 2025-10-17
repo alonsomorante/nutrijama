@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -95,10 +96,6 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
   }
 
   const hasActiveFilters = searchTerm !== "" || filterNutrient !== "all" || sortConfig !== null
-
-  // if (paginatedData.length === 0 && searchTerm !== "") {
-  //   return <div>Group not found</div>
-  // }
 
   return (
     <div className="space-y-6">
@@ -216,7 +213,24 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
                           } ${item.id === topItem?.id && filterNutrient !== "all" ? "bg-accent/5" : ""}`}
                       >
                         <td className="sticky left-0 z-20 bg-card px-4 py-3">
-                          <span className="font-medium text-foreground">{item.name}</span>
+                          <div className="flex items-center gap-3">
+                            {item.image && item.image !== "none" ? (
+                              <div className="relative h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="40px"
+                                />
+                              </div>
+                            ) : (
+                              <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                                <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <span className="font-medium text-foreground">{item.name}</span>
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-muted-foreground text-center">{item.energy.toFixed(1)}</td>
                         <td className="px-4 py-3 text-muted-foreground text-center">{item.protein.toFixed(1)}</td>
