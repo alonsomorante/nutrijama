@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowUpDown, ArrowUp, ArrowDown, Search, X } from "lucide-react"
+import { useState, useMemo } from "react"
+import { ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -11,6 +11,7 @@ import type { NutritionData, NutrientKey, SortConfig } from "@/lib/types"
 interface NutritionTableProps {
   data: NutritionData[]
   groupName: string
+  totalCount: number
 }
 
 const nutrientLabels: Record<NutrientKey, string> = {
@@ -27,30 +28,44 @@ const nutrientLabels: Record<NutrientKey, string> = {
   potassium: "Potasio (mg)",
 }
 
-export function NutritionTable({ data, groupName }: NutritionTableProps) {
+export function NutritionTable({ data, groupName, totalCount }: NutritionTableProps) {
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterNutrient, setFilterNutrient] = useState<NutrientKey | "all">("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 20
 
-  const filteredData = data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const { filteredData, sortedData, paginatedData, totalPages } = useMemo(() => {
+    const filtered = data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (!sortConfig) return 0
+    const sorted = [...filtered].sort((a, b) => {
+      if (!sortConfig) return 0
 
-    const aValue = a[sortConfig.key]
-    const bValue = b[sortConfig.key]
+      const aValue = a[sortConfig.key]
+      const bValue = b[sortConfig.key]
 
-    if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1
-    if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1
-    return 0
-  })
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1
+      return 0
+    })
 
-  const getTopItem = () => {
+    const totalPagesCount = Math.ceil(sorted.length / itemsPerPage)
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    const paginated = sorted.slice(startIndex, endIndex)
+
+    return {
+      filteredData: filtered,
+      sortedData: sorted,
+      paginatedData: paginated,
+      totalPages: totalPagesCount
+    }
+  }, [data, searchTerm, sortConfig, currentPage, itemsPerPage])
+
+  const topItem = useMemo(() => {
     if (filterNutrient === "all") return null
     return [...sortedData].sort((a, b) => b[filterNutrient] - a[filterNutrient])[0]
-  }
-
-  const topItem = getTopItem()
+  }, [sortedData, filterNutrient])
 
   const handleSort = (key: NutrientKey) => {
     setSortConfig((current) => {
@@ -62,6 +77,7 @@ export function NutritionTable({ data, groupName }: NutritionTableProps) {
       }
       return null
     })
+    setCurrentPage(1)
   }
 
   const getSortIcon = (key: NutrientKey) => {
@@ -75,9 +91,14 @@ export function NutritionTable({ data, groupName }: NutritionTableProps) {
     setSearchTerm("")
     setFilterNutrient("all")
     setSortConfig(null)
+    setCurrentPage(1)
   }
 
   const hasActiveFilters = searchTerm !== "" || filterNutrient !== "all" || sortConfig !== null
+
+  // if (paginatedData.length === 0 && searchTerm !== "") {
+  //   return <div>Group not found</div>
+  // }
 
   return (
     <div className="space-y-6">
@@ -91,7 +112,10 @@ export function NutritionTable({ data, groupName }: NutritionTableProps) {
                 type="search"
                 placeholder="Buscar por nombre..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1)
+                }}
                 className="pl-10"
               />
             </div>
@@ -99,7 +123,10 @@ export function NutritionTable({ data, groupName }: NutritionTableProps) {
 
           <div className="flex-1 space-y-2">
             <label className="text-sm font-medium text-foreground">Filtrar por nutriente</label>
-            <Select value={filterNutrient} onValueChange={(value) => setFilterNutrient(value as NutrientKey | "all")}>
+            <Select value={filterNutrient} onValueChange={(value) => {
+              setFilterNutrient(value as NutrientKey | "all")
+              setCurrentPage(1)
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar nutriente" />
               </SelectTrigger>
@@ -137,71 +164,136 @@ export function NutritionTable({ data, groupName }: NutritionTableProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
           <span>
-            Mostrando {sortedData.length} de {data.length} productos
+            Mostrando {paginatedData.length} de {sortedData.length} productos
+            {sortedData.length !== data.length && ` (filtrados de ${data.length} total)`}
           </span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <span>Página {currentPage} de {totalPages}</span>
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="rounded-lg border border-border bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-muted/50">
-                <th className="sticky left-0 z-20 bg-muted/50 px-4 py-3 text-left">
-                  <span className="text-sm font-semibold text-foreground">Producto</span>
-                </th>
-                {(Object.keys(nutrientLabels) as NutrientKey[]).map((key) => (
-                  <th key={key} className="px-4 py-3 text-left">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort(key)}
-                      className="h-auto gap-2 p-0 font-semibold hover:bg-transparent hover:text-accent"
-                    >
-                      <span className="text-sm">{nutrientLabels[key]}</span>
-                      {getSortIcon(key)}
-                    </Button>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.length === 0 ? (
-                <tr>
-                  <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
-                    No se encontraron productos que coincidan con tu búsqueda
-                  </td>
-                </tr>
-              ) : (
-                sortedData.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className={`border-b border-border transition-colors hover:bg-muted/30 ${index === sortedData.length - 1 ? "border-b-0" : ""
-                      } ${item.id === topItem?.id && filterNutrient !== "all" ? "bg-accent/5" : ""}`}
-                  >
-                    <td className="sticky left-0 z-20 bg-card px-4 py-3">
-                      <span className="font-medium text-foreground">{item.name}</span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.energy.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.protein.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.total_fat.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.total_carbohydrates.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.fibra.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.calcium.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.fosforo.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.zinc.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.iron.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.sodium.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-center">{item.potassium.toFixed(1)}</td>
+      {
+        paginatedData.length > 0 ? (
+          <div className="rounded-lg border border-border bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="sticky left-0 z-20 bg-muted/50 px-4 py-3 text-left">
+                      <span className="text-sm font-semibold text-foreground">Producto</span>
+                    </th>
+                    {(Object.keys(nutrientLabels) as NutrientKey[]).map((key) => (
+                      <th key={key} className="px-4 py-3 text-left">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSort(key)}
+                          className="h-auto gap-2 p-0 font-semibold hover:bg-transparent hover:text-accent"
+                        >
+                          <span className="text-sm">{nutrientLabels[key]}</span>
+                          {getSortIcon(key)}
+                        </Button>
+                      </th>
+                    ))}
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {paginatedData.length === 0 ? (
+                    <tr>
+                      <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
+                        No se encontraron productos que coincidan con tu búsqueda
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedData.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className={`border-b border-border transition-colors hover:bg-muted/30 ${index === paginatedData.length - 1 ? "border-b-0" : ""
+                          } ${item.id === topItem?.id && filterNutrient !== "all" ? "bg-accent/5" : ""}`}
+                      >
+                        <td className="sticky left-0 z-20 bg-card px-4 py-3">
+                          <span className="font-medium text-foreground">{item.name}</span>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.energy.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.protein.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.total_fat.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.total_carbohydrates.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.fibra.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.calcium.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.fosforo.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.zinc.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.iron.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.sodium.toFixed(1)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center">{item.potassium.toFixed(1)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div>No se encontraron productos que coincidan con tu búsqueda</div>
+        )
+      }
+
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="gap-2"
+          >
+            <ChevronLeft className="size-4" />
+            Anterior
+          </Button>
+
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNumber
+              if (totalPages <= 5) {
+                pageNumber = i + 1
+              } else if (currentPage <= 3) {
+                pageNumber = i + 1
+              } else if (currentPage >= totalPages - 2) {
+                pageNumber = totalPages - 4 + i
+              } else {
+                pageNumber = currentPage - 2 + i
+              }
+
+              return (
+                <Button
+                  key={pageNumber}
+                  variant={currentPage === pageNumber ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className="w-10"
+                >
+                  {pageNumber}
+                </Button>
+              )
+            })}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="gap-2"
+          >
+            Siguiente
+            <ChevronRight className="size-4" />
+          </Button>
         </div>
-      </div>
+      )}
     </div>
   )
 }
