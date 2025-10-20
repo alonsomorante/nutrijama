@@ -22,6 +22,7 @@ interface InlineFoodDetailProps {
 export function InlineFoodDetail({ food }: InlineFoodDetailProps) {
   const [grams, setGrams] = useState(100)
   const [inputValue, setInputValue] = useState('100')
+  const [showCalculator, setShowCalculator] = useState(false)
   const group = foodGroups.find(g => g.id === food.groupId)
 
   const multiplier = grams / 100
@@ -77,13 +78,37 @@ export function InlineFoodDetail({ food }: InlineFoodDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Widget flotante calculadora - parte superior derecha */}
+      {/* Botón flotante para mostrar/ocultar calculadora */}
       <div className="fixed top-20 right-6 z-50">
+        {!showCalculator && (
+          <Button
+            onClick={() => setShowCalculator(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-2xl rounded-full p-3"
+            size="sm"
+          >
+            <Calculator className="size-5" />
+          </Button>
+        )}
+      </div>
+
+      {/* Widget flotante calculadora - parte superior derecha */}
+      {showCalculator && (
+        <div className="fixed top-20 right-6 z-50">
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/95 dark:to-purple-950/95 border border-blue-200 dark:border-blue-800 shadow-2xl backdrop-blur-sm">
           <CardContent className="p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator className="size-4 text-blue-600" />
-              <span className="text-xs font-semibold text-blue-900 dark:text-blue-100">Calculadora</span>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <Calculator className="size-4 text-blue-600" />
+                <span className="text-xs font-semibold text-blue-900 dark:text-blue-100">Calculadora</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCalculator(false)}
+                className="size-6 p-0 hover:bg-red-100 dark:hover:bg-red-900"
+              >
+                <span className="text-xs">✕</span>
+              </Button>
             </div>
 
             <div className="space-y-2">
@@ -138,7 +163,8 @@ export function InlineFoodDetail({ food }: InlineFoodDetailProps) {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Header del alimento - diseño original */}
       <div className="text-center space-y-4">
