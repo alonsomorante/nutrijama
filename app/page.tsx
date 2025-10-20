@@ -1,20 +1,61 @@
-import { FoodGroupCard } from '@/components/home/food-card'
-import { foodGroups } from '@/lib/hardcode/food-groups'
+'use client'
 
-export default function page() {
+import { useState } from 'react'
+import { GlobalFoodSearch } from '@/components/search/global-food-search'
+import { FoodDetailView } from '@/components/food-detail/food-detail-view'
+import { MainNav } from '@/components/navigation/main-nav'
+import { NutritionData } from '@/lib/types'
+
+type FoodDetailData = NutritionData & {
+  groupId: string
+  groupName: string
+  groupIcon: string
+}
+
+export default function Page() {
+  const [selectedFood, setSelectedFood] = useState<FoodDetailData | null>(null)
+
+  const handleFoodSelect = (food: FoodDetailData) => {
+    setSelectedFood(food)
+  }
+
+  const handleCloseDetail = () => {
+    setSelectedFood(null)
+  }
+
+  if (selectedFood) {
+    return <FoodDetailView food={selectedFood} onClose={handleCloseDetail} />
+  }
+
   return (
-    <main>
-      <div className="mx-auto max-w-7xl px-6 py-12 md:px-12 md:py-16">
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-foreground">Grupos de Alimentos</h2>
-          <p className="text-muted-foreground">Selecciona un grupo para ver su información nutricional</p>
+    <div className="min-h-screen bg-background">
+      <MainNav />
+      
+      <main>
+        <div className="mx-auto max-w-4xl px-6 py-16 md:px-12 md:py-24">
+          <div className="text-center space-y-8">
+            <div className="space-y-4">
+              <div className="text-6xl mb-4">🔍</div>
+              <h1 className="text-4xl font-bold text-foreground md:text-5xl">
+                Buscar Alimentos
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Encuentra información nutricional detallada de cualquier alimento en nuestra base de datos
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <GlobalFoodSearch onFoodSelect={handleFoodSelect} />
+            </div>
+
+            <div className="pt-8 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                También puedes explorar por <strong>grupos de alimentos</strong> usando la navegación superior
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {foodGroups.map((group) => (
-            <FoodGroupCard key={group.id} group={group} />
-          ))}
-        </div>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
