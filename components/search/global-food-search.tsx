@@ -17,9 +17,10 @@ type SearchResult = NutritionData & {
 
 interface GlobalFoodSearchProps {
   onFoodSelect: (food: SearchResult) => void
+  onSearchStart: () => void
 }
 
-export function GlobalFoodSearch({ onFoodSelect }: GlobalFoodSearchProps) {
+export function GlobalFoodSearch({ onFoodSelect, onSearchStart }: GlobalFoodSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -45,6 +46,9 @@ export function GlobalFoodSearch({ onFoodSelect }: GlobalFoodSearchProps) {
         setIsLoading(false)
         return
       }
+
+      // Notificar que inició una búsqueda (para limpiar resultados previos)
+      onSearchStart()
 
       // Mostrar loading inmediatamente cuando hay query válido
       setIsLoading(true)
