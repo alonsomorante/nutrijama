@@ -28,16 +28,16 @@ export function MainNav() {
     <nav className="border-b border-border bg-card/50 backdrop-blur">
       <div className="mx-auto max-w-7xl px-6 py-4 md:px-12">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href={'/'} className="flex items-center gap-2">
             <div className="text-2xl">🥗</div>
             <h1 className="text-xl font-bold text-foreground">Nutrijama</h1>
-          </div>
-          
+          </Link>
+
           <div className="flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
-              
+
               return (
                 <Link key={item.href} href={item.href}>
                   <Button

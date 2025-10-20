@@ -73,7 +73,7 @@ export const foodGroups: FoodGroup[] = [
   {
     id: "fats",
     name: "Grasas y Aceites",
-    description: "Aceites, mantequilla, aguacate",
+    description: "Aceites",
     icon: "🧈",
     color: "from-yellow-500/10 to-lime-500/10 border-yellow-200 dark:border-yellow-900",
   },
