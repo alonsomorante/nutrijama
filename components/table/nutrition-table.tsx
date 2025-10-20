@@ -181,7 +181,7 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
                     <th className="sticky left-0 z-20 bg-muted/50 px-4 py-3 text-left">
-                      <span className="text-sm font-semibold text-foreground">Producto</span>
+                      <span className="text-sm font-semibold text-foreground"></span>
                     </th>
                     {(Object.keys(nutrientLabels) as NutrientKey[]).map((key) => (
                       <th key={key} className="px-4 py-3 text-left">
@@ -254,7 +254,6 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
           <div>No se encontraron productos que coincidan con tu búsqueda</div>
         )
       }
-
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
