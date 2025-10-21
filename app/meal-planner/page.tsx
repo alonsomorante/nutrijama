@@ -39,7 +39,7 @@ export default function MealPlannerPage() {
   }
 
   const handleUpdateWeight = (id: string, weight: number) => {
-    setIngredients(prev => 
+    setIngredients(prev =>
       prev.map(ing => ing.id === id ? { ...ing, weight } : ing)
     )
   }
@@ -56,7 +56,7 @@ export default function MealPlannerPage() {
         <div className="mx-auto max-w-6xl px-6 py-12 md:px-12 md:py-16">
           <div className="space-y-8">
             {/* Header */}
-            <div className="text-center space-y-4">
+            {/* <div className="text-center space-y-4">
               <div className="text-6xl mb-4">🍽️</div>
               <h1 className="text-4xl font-bold text-foreground md:text-5xl">
                 Planificador de Comidas
@@ -64,13 +64,13 @@ export default function MealPlannerPage() {
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Calcula los nutrientes totales de todos tus ingredientes agregando pesos personalizados
               </p>
-            </div>
+            </div> */}
 
             {/* Content Grid */}
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Meal Planner Form */}
               <div className="lg:col-span-2 space-y-6">
-                <MealPlannerForm 
+                <MealPlannerForm
                   onAddIngredient={handleAddIngredient}
                   ingredients={ingredients}
                   onRemoveIngredient={handleRemoveIngredient}
@@ -81,11 +81,11 @@ export default function MealPlannerPage() {
               {/* Right Sidebar */}
               <div className="space-y-6">
                 {/* Meal Plan Manager */}
-                <MealPlanManager 
+                <MealPlanManager
                   ingredients={ingredients}
                   onLoadPlan={handleLoadPlan}
                 />
-                
+
                 {/* Nutrition Summary */}
                 <NutritionSummary ingredients={ingredients} />
               </div>

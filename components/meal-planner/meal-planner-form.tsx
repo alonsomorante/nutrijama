@@ -18,18 +18,27 @@ interface MealPlannerFormProps {
   onUpdateWeight: (id: string, weight: number) => void
 }
 
-export function MealPlannerForm({ 
-  onAddIngredient, 
-  ingredients, 
-  onRemoveIngredient, 
-  onUpdateWeight 
+export function MealPlannerForm({
+  onAddIngredient,
+  ingredients,
+  onRemoveIngredient,
+  onUpdateWeight
 }: MealPlannerFormProps) {
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
   const [weight, setWeight] = useState('')
   const [showCustomForm, setShowCustomForm] = useState(false)
 
   const handleFoodSelect = (food: FoodItem) => {
-    setSelectedFood(food)
+    // Agregar directamente sin peso inicial
+    const ingredient: MealIngredient = {
+      id: '',
+      name: food.name,
+      weight: 0, // Peso por defecto
+      nutrition: food,
+      groupId: food.groupId,
+      isCustom: false
+    }
+    onAddIngredient(ingredient)
   }
 
   const handleAddSelected = () => {
@@ -68,36 +77,11 @@ export function MealPlannerForm({
             onFoodSelect={handleFoodSelect}
             onSearchStart={() => setSelectedFood(null)}
           />
-          
-          {selectedFood && (
-            <div className="p-4 border border-border rounded-lg bg-muted/50">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium">{selectedFood.name}</h4>
-                <Badge variant="outline">{selectedFood.groupName}</Badge>
-              </div>
-              
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="Peso en gramos"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleAddSelected}
-                  disabled={!weight || parseFloat(weight) <= 0}
-                >
-                  <Plus className="size-4 mr-2" />
-                  Agregar
-                </Button>
-              </div>
-            </div>
-          )}
-          
+
+
           <div className="pt-4 border-t border-border">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowCustomForm(true)}
               className="w-full"
             >
@@ -129,7 +113,7 @@ export function MealPlannerForm({
           ) : (
             <div className="space-y-3">
               {ingredients.map((ingredient) => (
-                <div 
+                <div
                   key={ingredient.id}
                   className="flex items-center gap-3 p-3 border border-border rounded-lg"
                 >
@@ -146,16 +130,26 @@ export function MealPlannerForm({
                       {ingredient.weight}g • {((ingredient.nutrition.energy * ingredient.weight) / 100).toFixed(1)} kcal
                     </div>
                   </div>
-                  
+
                   <Input
                     type="number"
-                    value={ingredient.weight}
-                    onChange={(e) => onUpdateWeight(ingredient.id, parseFloat(e.target.value) || 0)}
+                    value={ingredient.weight === 0 ? '' : ingredient.weight}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '') {
+                        onUpdateWeight(ingredient.id, 0)
+                      } else {
+                        const numValue = parseFloat(value)
+                        if (!isNaN(numValue)) {
+                          onUpdateWeight(ingredient.id, numValue)
+                        }
+                      }
+                    }}
+                    placeholder="0"
                     className="w-20 text-center"
-                    min="0"
                     step="1"
                   />
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"

@@ -18,6 +18,7 @@ export function InstantFoodSearch({ onFoodSelect, onSearchStart }: InstantFoodSe
   const [results, setResults] = useState<FoodItem[]>([])
   const [showResults, setShowResults] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const searchRef = useRef<HTMLDivElement>(null)
   
   const { searchFoods, isLoading: isDataLoading, isLoaded, error } = useFoodData()
@@ -55,6 +56,7 @@ export function InstantFoodSearch({ onFoodSelect, onSearchStart }: InstantFoodSe
       // Búsqueda instantánea en memoria
       const searchResults = searchFoods(query)
       setResults(searchResults)
+      setSelectedIndex(-1) // Reset selection
       setIsSearching(false)
     }
 
@@ -71,12 +73,14 @@ export function InstantFoodSearch({ onFoodSelect, onSearchStart }: InstantFoodSe
     onFoodSelect(food)
     setQuery('')
     setShowResults(false)
+    setSelectedIndex(-1)
   }
 
   const clearSearch = () => {
     setQuery('')
     setResults([])
     setShowResults(false)
+    setSelectedIndex(-1)
   }
 
   const getSearchStatus = () => {
@@ -109,10 +113,12 @@ export function InstantFoodSearch({ onFoodSelect, onSearchStart }: InstantFoodSe
     if (results.length > 0) {
       return (
         <div className="p-2">
-          {results.map((food) => (
+          {results.map((food, index) => (
             <div
               key={`${food.groupId}-${food.id}`}
-              className="flex items-center gap-3 rounded-md p-3 hover:bg-muted cursor-pointer transition-colors"
+              className={`flex items-center gap-3 rounded-md p-3 cursor-pointer transition-colors ${
+                index === selectedIndex ? 'bg-accent' : 'hover:bg-muted'
+              }`}
               onClick={() => handleFoodSelect(food)}
             >
               <div className="text-2xl">{food.groupIcon}</div>
@@ -157,6 +163,18 @@ export function InstantFoodSearch({ onFoodSelect, onSearchStart }: InstantFoodSe
           }
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault()
+              setSelectedIndex(prev => Math.min(prev + 1, results.length - 1))
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault()
+              setSelectedIndex(prev => Math.max(prev - 1, -1))
+            } else if (e.key === 'Enter' && selectedIndex >= 0 && results[selectedIndex]) {
+              e.preventDefault()
+              handleFoodSelect(results[selectedIndex])
+            }
+          }}
           className="pl-10 pr-10"
           disabled={isDataLoading}
         />
