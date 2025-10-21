@@ -1,21 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { GlobalFoodSearch } from '@/components/search/global-food-search'
+import { InstantFoodSearch } from '@/components/search/instant-food-search'
 import { InlineFoodDetail } from '@/components/food-detail/inline-food-detail'
 import { MainNav } from '@/components/navigation/main-nav'
-import { NutritionData } from '@/lib/types'
-
-type FoodDetailData = NutritionData & {
-  groupId: string
-  groupName: string
-  groupIcon: string
-}
+import { FoodItem } from '@/lib/contexts/food-data-context'
 
 export default function Page() {
-  const [selectedFood, setSelectedFood] = useState<FoodDetailData | null>(null)
+  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
 
-  const handleFoodSelect = (food: FoodDetailData) => {
+  const handleFoodSelect = (food: FoodItem) => {
     setSelectedFood(food)
   }
 
@@ -44,7 +38,7 @@ export default function Page() {
               </div> */}
 
               <div className="flex justify-center">
-                <GlobalFoodSearch
+                <InstantFoodSearch
                   onFoodSelect={handleFoodSelect}
                   onSearchStart={handleSearchStart}
                 />

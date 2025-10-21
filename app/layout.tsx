@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { FoodDataProvider } from "@/lib/contexts/food-data-context";
 
 const geistSans = Inter({
   variable: "--font-geist-sans",
@@ -34,7 +35,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <FoodDataProvider>
+          {children}
+        </FoodDataProvider>
       </body>
     </html>
   );

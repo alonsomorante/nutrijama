@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react"
+import { ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronLeft, ChevronRight, ImageIcon, Trophy, Zap, Shield } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,11 +32,11 @@ const nutrientLabels: Record<NutrientKey, string> = {
 export function NutritionTable({ data, groupName, totalCount }: NutritionTableProps) {
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterNutrient, setFilterNutrient] = useState<NutrientKey | "all">("all")
+  const [showTopValues, setShowTopValues] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 20
 
-  const { filteredData, sortedData, paginatedData, totalPages } = useMemo(() => {
+  const { filteredData, sortedData, paginatedData, totalPages, topNutritionalValues } = useMemo(() => {
     const filtered = data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const sorted = [...filtered].sort((a, b) => {
@@ -55,18 +55,25 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
     const endIndex = startIndex + itemsPerPage
     const paginated = sorted.slice(startIndex, endIndex)
 
+    // Calcular top valores nutricionales
+    const topValues = {
+      highestProtein: [...filtered].sort((a, b) => b.protein - a.protein)[0],
+      highestFiber: [...filtered].sort((a, b) => b.fibra - a.fibra)[0],
+      lowestSodium: [...filtered].sort((a, b) => a.sodium - b.sodium)[0],
+      highestCalcium: [...filtered].sort((a, b) => b.calcium - a.calcium)[0],
+      highestIron: [...filtered].sort((a, b) => b.iron - a.iron)[0],
+      lowestCalories: [...filtered].sort((a, b) => a.energy - b.energy)[0],
+    }
+
     return {
       filteredData: filtered,
       sortedData: sorted,
       paginatedData: paginated,
-      totalPages: totalPagesCount
+      totalPages: totalPagesCount,
+      topNutritionalValues: topValues
     }
   }, [data, searchTerm, sortConfig, currentPage, itemsPerPage])
 
-  const topItem = useMemo(() => {
-    if (filterNutrient === "all") return null
-    return [...sortedData].sort((a, b) => b[filterNutrient] - a[filterNutrient])[0]
-  }, [sortedData, filterNutrient])
 
   const handleSort = (key: NutrientKey) => {
     setSortConfig((current) => {
@@ -90,12 +97,11 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
 
   const clearFilters = () => {
     setSearchTerm("")
-    setFilterNutrient("all")
     setSortConfig(null)
     setCurrentPage(1)
   }
 
-  const hasActiveFilters = searchTerm !== "" || filterNutrient !== "all" || sortConfig !== null
+  const hasActiveFilters = searchTerm !== "" || sortConfig !== null
 
   return (
     <div className="space-y-6">
@@ -119,23 +125,15 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
           </div>
 
           <div className="flex-1 space-y-2">
-            <label className="text-sm font-medium text-foreground">Filtrar por nutriente</label>
-            <Select value={filterNutrient} onValueChange={(value) => {
-              setFilterNutrient(value as NutrientKey | "all")
-              setCurrentPage(1)
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar nutriente" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los nutrientes</SelectItem>
-                {(Object.keys(nutrientLabels) as NutrientKey[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {nutrientLabels[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium text-foreground">Mejores valores nutricionales</label>
+            <Button
+              variant={showTopValues ? "default" : "outline"}
+              onClick={() => setShowTopValues(!showTopValues)}
+              className="w-full justify-start gap-2"
+            >
+              <Trophy className="size-4" />
+              {showTopValues ? "Ocultar destacados" : "Ver destacados"}
+            </Button>
           </div>
 
           {hasActiveFilters && (
@@ -146,17 +144,84 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
           )}
         </div>
 
-        {topItem && filterNutrient !== "all" && (
-          <div className="rounded-md border border-accent/20 bg-accent/5 p-4">
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">
-                Mayor contenido
-              </Badge>
-              <span className="font-medium text-foreground">{topItem.name}</span>
-              <span className="text-muted-foreground">-</span>
-              <span className="text-sm text-muted-foreground">
-                {nutrientLabels[filterNutrient]}: <span className="font-semibold">{topItem[filterNutrient]}</span>
-              </span>
+        {showTopValues && topNutritionalValues && (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="size-4 text-green-600" />
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  Más Proteína
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-green-900">{topNutritionalValues.highestProtein?.name}</p>
+                <p className="text-sm text-green-700">{topNutritionalValues.highestProtein?.protein.toFixed(1)}g proteína</p>
+              </div>
+            </div>
+            
+            <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="size-4 text-orange-600" />
+                <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                  Más Fibra
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-orange-900">{topNutritionalValues.highestFiber?.name}</p>
+                <p className="text-sm text-orange-700">{topNutritionalValues.highestFiber?.fibra.toFixed(1)}g fibra</p>
+              </div>
+            </div>
+            
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Trophy className="size-4 text-blue-600" />
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  Menos Sodio
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-blue-900">{topNutritionalValues.lowestSodium?.name}</p>
+                <p className="text-sm text-blue-700">{topNutritionalValues.lowestSodium?.sodium.toFixed(1)}mg sodio</p>
+              </div>
+            </div>
+            
+            <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="size-4 text-purple-600" />
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                  Más Calcio
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-purple-900">{topNutritionalValues.highestCalcium?.name}</p>
+                <p className="text-sm text-purple-700">{topNutritionalValues.highestCalcium?.calcium.toFixed(1)}mg calcio</p>
+              </div>
+            </div>
+            
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="size-4 text-red-600" />
+                <Badge variant="secondary" className="bg-red-100 text-red-800">
+                  Más Hierro
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-red-900">{topNutritionalValues.highestIron?.name}</p>
+                <p className="text-sm text-red-700">{topNutritionalValues.highestIron?.iron.toFixed(2)}mg hierro</p>
+              </div>
+            </div>
+            
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Trophy className="size-4 text-emerald-600" />
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
+                  Menos Calorías
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-emerald-900">{topNutritionalValues.lowestCalories?.name}</p>
+                <p className="text-sm text-emerald-700">{topNutritionalValues.lowestCalories?.energy.toFixed(0)} kcal</p>
+              </div>
             </div>
           </div>
         )}
@@ -209,8 +274,9 @@ export function NutritionTable({ data, groupName, totalCount }: NutritionTablePr
                     paginatedData.map((item, index) => (
                       <tr
                         key={item.id}
-                        className={`border-b border-border transition-colors hover:bg-muted/30 ${index === paginatedData.length - 1 ? "border-b-0" : ""
-                          } ${item.id === topItem?.id && filterNutrient !== "all" ? "bg-accent/5" : ""}`}
+                        className={`border-b border-border transition-colors hover:bg-muted/30 ${
+                          index === paginatedData.length - 1 ? "border-b-0" : ""
+                        }`}
                       >
                         <td className="sticky left-0 z-20 bg-card px-4 py-3">
                           <div className="flex items-center gap-3">

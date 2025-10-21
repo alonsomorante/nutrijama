@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Search, Grid3X3 } from 'lucide-react'
+import { Search, Grid3X3, Calculator } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function MainNav() {
@@ -21,6 +21,12 @@ export function MainNav() {
       label: 'Grupos',
       icon: Grid3X3,
       description: 'Ver por grupos'
+    },
+    {
+      href: '/meal-planner',
+      label: 'Planificador',
+      icon: Calculator,
+      description: 'Planificar comidas'
     }
   ]
 
@@ -36,7 +42,7 @@ export function MainNav() {
           <div className="flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href || (item.href === '/groups' && pathname.startsWith('/groups'))
 
               return (
                 <Link key={item.href} href={item.href}>
