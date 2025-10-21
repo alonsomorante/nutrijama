@@ -29,12 +29,12 @@ export function FoodDetailView({ food, onClose }: FoodDetailViewProps) {
 
   const handleInputChange = (value: string) => {
     setInputValue(value)
-    
+
     if (value === '' || value === '0') {
       // Permitir campo vacío temporalmente
       return
     }
-    
+
     const numValue = Number(value)
     if (!isNaN(numValue) && numValue > 0) {
       setGrams(numValue)
@@ -189,7 +189,7 @@ export function FoodDetailView({ food, onClose }: FoodDetailViewProps) {
                 <Calculator className="size-4 text-blue-600" />
                 <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">Calculadora</span>
               </div>
-              
+
               <div className="space-y-3">
                 {/* Control principal */}
                 <div className="flex items-center gap-2">
@@ -202,9 +202,10 @@ export function FoodDetailView({ food, onClose }: FoodDetailViewProps) {
                   >
                     <Minus className="size-3" />
                   </Button>
-                  
+
                   <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-md px-2 py-1 border min-w-0">
                     <Input
+
                       type="text"
                       value={inputValue}
                       onChange={(e) => handleInputChange(e.target.value)}
@@ -214,7 +215,7 @@ export function FoodDetailView({ food, onClose }: FoodDetailViewProps) {
                     />
                     <span className="text-xs text-muted-foreground">g</span>
                   </div>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
